@@ -5,12 +5,21 @@ namespace LazyPathFollow2D;
 
 public partial class LazyPathFollow2D : PathFollow2D
 {
-	[Export(PropertyHint.Range, hintString: "0,1,0.001,TEST")]
+	[ExportCategory("Rotation")]
+	[Export(PropertyHint.Range, hintString: "0,1,0.001")]
 	private float _angleCorrection = 1f;
 
+	[Export(PropertyHint.Range, hintString: "0,360,1")]
+	private int _maxAngleCorrectionPerTick = 360;
+
+	[ExportCategory("Position")]
 	[Export(PropertyHint.Range, hintString: "0,1,0.001")]
 	private float _positionCorrection = 1f;
 
+	[Export]
+	private Vector2 _maxPositionCorrectionPerTick = new (float.MaxValue, float.MaxValue);
+
+	[ExportCategory("Remote")]
 	[Export]
 	public Node2D? RemoteTarget;
 
@@ -23,8 +32,14 @@ public partial class LazyPathFollow2D : PathFollow2D
 		if (RemoteTarget is null)
 			return;
 
-		RemoteTarget.Rotation = Mathf.LerpAngle(RemoteTarget.Rotation, Rotation, _angleCorrection);
-		RemoteTarget.GlobalPosition = RemoteTarget.GlobalPosition.Lerp(GlobalPosition, _positionCorrection);
+		var targetRotation = Mathf.LerpAngle(RemoteTarget.Rotation, Rotation, _angleCorrection);
+		var targetPosition = RemoteTarget.GlobalPosition.Lerp(GlobalPosition, _positionCorrection);
+		RemoteTarget.Rotation += Mathf.DegToRad(Mathf.Clamp(Mathf.RadToDeg(targetRotation - RemoteTarget.Rotation),
+			-_maxAngleCorrectionPerTick, _maxAngleCorrectionPerTick));
+
+		var positionDelta = targetPosition - RemoteTarget.GlobalPosition;
+		RemoteTarget.GlobalPosition +=
+			positionDelta.Clamp(-_maxPositionCorrectionPerTick, _maxPositionCorrectionPerTick);
 	}
 
 
