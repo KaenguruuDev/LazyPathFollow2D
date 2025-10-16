@@ -9,7 +9,7 @@ public partial class LazyPathFollow2D : PathFollow2D
 	private float _angleCorrection = 1f;
 
 	[Export(PropertyHint.Range, hintString: "0,1,0.001")]
-	private float _positionalCorrection = 1f;
+	private float _positionCorrection = 1f;
 
 	[Export]
 	public Node2D? RemoteTarget;
@@ -24,7 +24,7 @@ public partial class LazyPathFollow2D : PathFollow2D
 			return;
 
 		RemoteTarget.Rotation = Mathf.LerpAngle(RemoteTarget.Rotation, Rotation, _angleCorrection);
-		RemoteTarget.GlobalPosition = RemoteTarget.GlobalPosition.Lerp(GlobalPosition, _positionalCorrection);
+		RemoteTarget.GlobalPosition = RemoteTarget.GlobalPosition.Lerp(GlobalPosition, _positionCorrection);
 	}
 
 
